@@ -5,21 +5,27 @@ Imports System.Net
 Module ExchangeRates
 
     Sub Main()
-        Dim args As String()
-        args = System.Environment.GetCommandLineArgs()
-        Dim arg As String
-        If UBound(args) = 0 Then
-            arg = "C:\load.xml"
-        Else
-            arg = args(1)
-        End If
-        Dim url As String = urlBuilder()
-        If urlCheck(url) Then
-            xmlParse(url, arg)
-        Else
-            End
-        End If
-        Exit Sub
+        Try
+
+            Dim args As String()
+            args = System.Environment.GetCommandLineArgs()
+            Dim arg As String
+            If UBound(args) = 0 Then
+                arg = "C:\load.xml"
+            Else
+                arg = args(1)
+            End If
+            Dim url As String = urlBuilder()
+            If urlCheck(url) Then
+                xmlParse(url, arg)
+            Else
+                End
+            End If
+
+        Catch ex As Exception
+            Console.Write(ex.Message)
+        End Try
+
     End Sub
 
 
@@ -97,13 +103,15 @@ Module ExchangeRates
                             .WriteAttributeString("DATE", Values(2))
                         End If
                         'write lower
-                        .WriteStartElement("LowerLevelRow")
-                        .WriteAttributeString("CURRENCY", dctCode(Values(0)))
-                        .WriteAttributeString("EXCHANGE", Math.Round(1 / CDbl(Values(1)), 4))
-                        .WriteAttributeString("CROSSEXCHANGE", Values(1))
-                        .WriteEndElement()
-
+                        If Values(0).Length > 0 Then
+                            .WriteStartElement("LowerLevelRow")
+                            .WriteAttributeString("CURRENCY", dctCode(Values(0)))
+                            .WriteAttributeString("EXCHANGE", Math.Round(1 / CDbl(Values(1)), 4))
+                            .WriteAttributeString("CROSSEXCHANGE", Values(1))
+                            .WriteEndElement()
+                        End If
                         aSwitch = True
+
                     End If
 
                 Next
